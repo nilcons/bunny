@@ -99,33 +99,40 @@ function drawGameField() {
     }
 }
 
-// handle keyboard input
-window.addEventListener('keydown', function(e) {
-    let newPosition = {x: rabbitPosition.x, y: rabbitPosition.y};
-    if (e.key === 'ArrowUp') {
-        if (lastMove === 'right') {
-            newPosition.y--;
-            newPosition.x++;
-        } else {
-            newPosition.y--;
-            newPosition.x--;
-        }
-    }
-    else if (e.key === 'ArrowDown') newPosition.y++;
-    else if (e.key === 'ArrowLeft') {
-        newPosition.x--;
-        lastMove = 'left';
-    }
-    else if (e.key === 'ArrowRight') {
-        newPosition.x++;
-        lastMove = 'right';
-    }
+
+function tryMove(dx, dy) {
+    let newPosition = {x: rabbitPosition.x + dx, y: rabbitPosition.y + dy};
 
     if (gameField[newPosition.y][newPosition.x] !== WALL) {
         gameField[rabbitPosition.y][rabbitPosition.x] = EMPTY;
         rabbitPosition = newPosition;
         gameField[rabbitPosition.y][rabbitPosition.x] = RABBIT;
     }
+}
+
+// handle keyboard input
+window.addEventListener('keydown', function(e) {
+    switch (e.key) {
+    case 'ArrowUp':
+        if (lastMove === 'right')
+            tryMove(1, -1);
+        else
+            tryMove(-1, -1);
+        break;
+    case 'ArrowLeft':
+        if (lastMove === 'left')
+            tryMove(-1, 0);
+        else
+            lastMove = 'left';
+        break;
+    case 'ArrowRight':
+        if (lastMove === 'right')
+            tryMove(1, 0);
+        else
+            lastMove = 'right';
+        break;
+    }
+
 
     applyGravity();
     drawGameField();
