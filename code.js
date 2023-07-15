@@ -22,6 +22,9 @@ let ctx = canvas.getContext('2d');
 // size of each cell in pixels
 let cellSize = 30;
 
+// moving disabled, because we are doing gravity check
+let gravityInMotion = false;
+
 // initialize game field
 function initializeGameField() {
     for (let y = 0; y < gridSize; y++) {
@@ -49,22 +52,31 @@ function initializeGameField() {
 }
 
 function applyGravity() {
-    for (let n = 0; n <= gridSize; n++) {
-        for (let y = gridSize - 2; y >= 0; y--) {
-            for (let x = 0; x < gridSize; x++) {
-                if (gameField[y][x] === BOX || gameField[y][x] === RABBIT) {
-                    // check if the space below is empty
-                    if (gameField[y + 1][x] === EMPTY) {
-                        // move the box or the rabbit down
-                        gameField[y + 1][x] = gameField[y][x];
-                        gameField[y][x] = EMPTY;
-                        if (gameField[y + 1][x] === RABBIT) {
-                            rabbitPosition.y++;
-                        }
+    let gravityWasApplied = false;
+    for (let y = gridSize - 2; y >= 0; y--) {
+        for (let x = 0; x < gridSize; x++) {
+            if (gameField[y][x] === BOX || gameField[y][x] === RABBIT) {
+                // check if the space below is empty
+                if (gameField[y + 1][x] === EMPTY) {
+                    // move the box or the rabbit down
+                    gravityWasApplied = true;
+                    gameField[y + 1][x] = gameField[y][x];
+                    gameField[y][x] = EMPTY;
+                    if (gameField[y + 1][x] === RABBIT) {
+                        rabbitPosition.y++;
                     }
                 }
             }
         }
+    }
+
+    drawGameField();
+
+    if (gravityWasApplied) {
+        gravityInMotion = true;
+        setTimeout(applyGravity, 100);
+    } else {
+        gravityInMotion = false;
     }
 }
 
@@ -101,22 +113,44 @@ function drawGameField() {
 
 
 function tryMove(dx, dy) {
-    let newPosition = {x: rabbitPosition.x + dx, y: rabbitPosition.y + dy};
+    let newX = rabbitPosition.x + dx;
+    let newY = rabbitPosition.y + dy;
 
-    if (gameField[newPosition.y][newPosition.x] !== WALL) {
-        gameField[rabbitPosition.y][rabbitPosition.x] = EMPTY;
-        rabbitPosition = newPosition;
-        gameField[rabbitPosition.y][rabbitPosition.x] = RABBIT;
+    // the new position is a wall
+    if (gameField[newY][newX] === WALL) return;
+
+    if (gameField[newY][newX] === BOX) {
+        // the new position is a box
+        let beyondX = newX + dx;
+
+        if (gameField[newY][beyondX] === EMPTY) {
+            // the position beyond the box is empty
+            // move the box
+            gameField[newY][beyondX] = BOX;
+            gameField[newY][newX] = EMPTY;
+        } else {
+            // the box can't be moved
+            return;
+        }
     }
+
+    // move the rabbit
+    gameField[rabbitPosition.y][rabbitPosition.x] = EMPTY;
+    rabbitPosition.x = newX;
+    rabbitPosition.y = newY;
+    gameField[newY][newX] = RABBIT;
 }
 
 // handle keyboard input
 window.addEventListener('keydown', function(e) {
+    if (gravityInMotion) return;
+
     switch (e.key) {
     case 'ArrowUp':
-        if (lastMove === 'right')
+        if ([ WALL, BOX ].includes(gameField[rabbitPosition.y - 1][rabbitPosition.x])) return;
+        if (lastMove === 'right' && [ WALL, BOX ].includes(gameField[rabbitPosition.y][rabbitPosition.x + 1]))
             tryMove(1, -1);
-        else
+        if (lastMove === 'left' && [ WALL, BOX ].includes(gameField[rabbitPosition.y][rabbitPosition.x - 1]))
             tryMove(-1, -1);
         break;
     case 'ArrowLeft':
@@ -133,9 +167,7 @@ window.addEventListener('keydown', function(e) {
         break;
     }
 
-
     applyGravity();
-    drawGameField();
 });
 
 // // main game loop
@@ -155,4 +187,3 @@ ctx.font = `${cellSize}px 'color-emoji', serif`;
 // start the game
 initializeGameField();
 applyGravity();
-drawGameField();
