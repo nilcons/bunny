@@ -4,7 +4,7 @@ let gridWidth = 30;
 let gridHeight = 22;
 
 // emoji codes
-const WALL = '🟥';
+const WALL = '🟦';
 const RABBIT = '🐇';
 const BOX = '📦';
 const CARROT = '🥕';
