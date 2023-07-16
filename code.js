@@ -59,35 +59,39 @@ function initializeGameField() {
     }
 }
 
-function applyGravity() {
-    let gravityWasApplied = false;
+async function applyGravity() {
+    drawGameField();
 
-    for (let y = gridHeight - 2; y >= 0; y--) {
-        for (let x = 0; x < gridWidth; x++) {
-            if (gameField[y][x] === BOX || gameField[y][x] === BUNNY) {
-                // check if the space below is empty
-                if (gameField[y + 1][x] === EMPTY || gameField[y + 1][x] === CARROT) {
-                    // move the box or the bunny down
-                    gravityWasApplied = true;
-                    if (gameField[y][x] === BUNNY) {
-                        if (gameField[y + 1][x] === CARROT) collectedCarrots++;
-                        bunnyPosition.y++;
+    gravityInMotion = true;
+
+    while (true) {
+        let gravityWasApplied = false;
+        for (let y = gridHeight - 2; y >= 0; y--) {
+            for (let x = 0; x < gridWidth; x++) {
+                if (gameField[y][x] === BOX || gameField[y][x] === BUNNY) {
+                    // check if the space below is empty
+                    if (gameField[y + 1][x] === EMPTY || gameField[y + 1][x] === CARROT) {
+                        // move the box or the bunny down
+                        gravityWasApplied = true;
+                        if (gameField[y][x] === BUNNY) {
+                            if (gameField[y + 1][x] === CARROT) collectedCarrots++;
+                            bunnyPosition.y++;
+                        }
+                        gameField[y + 1][x] = gameField[y][x];
+                        gameField[y][x] = EMPTY;
                     }
-                    gameField[y + 1][x] = gameField[y][x];
-                    gameField[y][x] = EMPTY;
                 }
             }
         }
-    }
 
-    drawGameField();
-
-    if (gravityWasApplied) {
-        gravityInMotion = true;
-        setTimeout(applyGravity, 100);
-    } else {
-        gravityInMotion = false;
-    }
+        if (!gravityWasApplied) {
+            gravityInMotion = false;
+            break;
+        } else {
+            await new Promise(r => setTimeout(r, 100));
+            drawGameField();
+        }
+    };
 }
 
 // draw the game field
@@ -199,7 +203,7 @@ function placeCarrot() {
 }
 
 // handle keyboard input
-window.addEventListener('keydown', function(e) {
+window.addEventListener('keydown', async function(e) {
     if (gravityInMotion) return;
 
     switch (e.key) {
@@ -218,7 +222,7 @@ window.addEventListener('keydown', function(e) {
         placeCarrot();
     }
 
-    applyGravity();
+    await applyGravity();
 });
 
 // setup canvas
@@ -239,5 +243,9 @@ window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
 // start the game
-initializeGameField();
-applyGravity();
+async function startGame() {
+    await initializeGameField();
+    await applyGravity();
+}
+
+startGame();
