@@ -135,6 +135,16 @@ function tryMove(dx, dy) {
     if (gameField[newY][newX] === WALL) return;
 
     if (gameField[newY][newX] === BOX) {
+        if (dy === -1) {
+            // no box pushing while jumping
+            return;
+        }
+
+        if (gameField[newY-1][newX] === BOX) {
+            // no pushing stacked boxes
+            return;
+        }
+
         // the new position is a box
         let beyondX = newX + dx;
 
