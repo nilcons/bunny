@@ -3,6 +3,7 @@ const gridWidth = 32;
 const gridHeight = 24;
 
 // emoji codes
+const DOOR = '🚪';
 const WALL = '🟦';
 const BUNNY = '🐇';
 const BOX = '🟩';
@@ -74,8 +75,10 @@ function stringToGameField(inputString) {
                 bx = x;
                 break;
             case ' ':
-            case 'g':
                 gameField[y][x] = EMPTY;
+                break;
+            case 'g':
+                gameField[y][x] = DOOR;
                 break;
             case 'c':
                 gameField[y][x] = CARROT;
@@ -196,6 +199,7 @@ function drawGameField() {
                 ctx.restore();
                 break;
             case CARROT:
+            case DOOR:
                 ctx.fillText(emoji, x * cellSize, y * cellSize);
             }
         }
@@ -253,6 +257,8 @@ function tryMove(dx, dy) {
 
     // the new position is a wall
     if (obstacle(gameField[newY][newX])) return;
+
+    if (gameField[newY][newX] === DOOR) alert("Congratulations");
 
     // move the bunny
     if (gameField[newY][newX] === CARROT) collectedCarrots++;
