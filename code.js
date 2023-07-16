@@ -178,7 +178,7 @@ window.addEventListener('keydown', function(e) {
 canvas.width = cellSize * gridWidth;
 canvas.height = cellSize * gridHeight;
 ctx.textBaseline = 'top';
-ctx.font = `${cellSize}px 'color-emoji', serif`;
+ctx.font = `${cellSize}px 'Noto Color Emoji', serif`;
 
 // start the game
 initializeGameField();
