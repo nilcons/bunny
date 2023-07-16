@@ -6,7 +6,7 @@ let gridHeight = 22;
 // emoji codes
 const WALL = '🟦';
 const RABBIT = '🐇';
-const BOX = '📦';
+const BOX = '🟫';
 const CARROT = '🥕';
 const EMPTY = '⬜';
 
