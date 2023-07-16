@@ -134,13 +134,16 @@ function drawGameField() {
 
 function tryMove(dx, dy) {
     if (dy === -1) {
-        // during jump, nothing can be on top of us
+        // if carrot on top, jump means to only eat it
         if (gameField[rabbitPosition.y - 1][rabbitPosition.x] === CARROT) {
             collectedCarrots++;
             gameField[rabbitPosition.y - 1][rabbitPosition.x] = EMPTY;
             return;
         }
+        // during jump, nothing can be on top of us
         if (obstacle(gameField[rabbitPosition.y - 1][rabbitPosition.x])) return;
+        // we can only jump if there is obstacle in front
+        if (!obstacle(gameField[rabbitPosition.y][rabbitPosition.x + lastMove])) return;
     }
 
     let newX = rabbitPosition.x + dx;
@@ -201,8 +204,7 @@ window.addEventListener('keydown', function(e) {
 
     switch (e.key) {
     case 'ArrowUp':
-        if (obstacle(gameField[rabbitPosition.y][rabbitPosition.x + lastMove]))
-            tryMove(lastMove, -1);
+        tryMove(lastMove, -1);
         break;
     case 'ArrowLeft':
     case 'ArrowRight':
