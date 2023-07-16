@@ -5,7 +5,7 @@ let gridHeight = 22;
 
 // emoji codes
 const WALL = '🟦';
-const RABBIT = '🐇';
+const BUNNY = '🐇';
 const BOX = '🟩';
 const CARROT = '🥕';
 const PLACED_CARROT = '🟧';
@@ -15,8 +15,8 @@ function obstacle(c) { return (c === WALL || c === PLACED_CARROT || c === BOX); 
 // the game field
 let gameField = [];
 
-// the rabbit position
-let rabbitPosition = {x: 0, y: 0};
+// the bunny position
+let bunnyPosition = {x: 0, y: 0};
 let lastMove = 1; // 1 is right, -1 is left
 let collectedCarrots = 0;
 /*    END OF GAME   STATE   */
@@ -46,9 +46,9 @@ function initializeGameField() {
         }
     }
 
-    // place a rabbit at a random position
-    rabbitPosition = {x: Math.floor(Math.random() * (gridWidth - 2) + 1), y: Math.floor(Math.random() * (gridHeight - 2) + 1)};
-    gameField[rabbitPosition.y][rabbitPosition.x] = RABBIT;
+    // place a bunny at a random position
+    bunnyPosition = {x: Math.floor(Math.random() * (gridWidth - 2) + 1), y: Math.floor(Math.random() * (gridHeight - 2) + 1)};
+    gameField[bunnyPosition.y][bunnyPosition.x] = BUNNY;
 
     // place some boxes at random positions
     for (let i = 0; i < 35; i++) {
@@ -64,14 +64,14 @@ function applyGravity() {
 
     for (let y = gridHeight - 2; y >= 0; y--) {
         for (let x = 0; x < gridWidth; x++) {
-            if (gameField[y][x] === BOX || gameField[y][x] === RABBIT) {
+            if (gameField[y][x] === BOX || gameField[y][x] === BUNNY) {
                 // check if the space below is empty
                 if (gameField[y + 1][x] === EMPTY || gameField[y + 1][x] === CARROT) {
-                    // move the box or the rabbit down
+                    // move the box or the bunny down
                     gravityWasApplied = true;
-                    if (gameField[y][x] === RABBIT) {
+                    if (gameField[y][x] === BUNNY) {
                         if (gameField[y + 1][x] === CARROT) collectedCarrots++;
-                        rabbitPosition.y++;
+                        bunnyPosition.y++;
                     }
                     gameField[y + 1][x] = gameField[y][x];
                     gameField[y][x] = EMPTY;
@@ -98,7 +98,7 @@ function drawGameField() {
             let emoji = gameField[y][x];
 
             switch (emoji) {
-            case RABBIT:
+            case BUNNY:
                 if (lastMove === 1) {
                     // if moving right, bunny has to be mirrored (in the font it's facing left)
                     ctx.save(); // save the current state
@@ -135,19 +135,19 @@ function drawGameField() {
 function tryMove(dx, dy) {
     if (dy === -1) {
         // if carrot on top, jump means to only eat it
-        if (gameField[rabbitPosition.y - 1][rabbitPosition.x] === CARROT) {
+        if (gameField[bunnyPosition.y - 1][bunnyPosition.x] === CARROT) {
             collectedCarrots++;
-            gameField[rabbitPosition.y - 1][rabbitPosition.x] = EMPTY;
+            gameField[bunnyPosition.y - 1][bunnyPosition.x] = EMPTY;
             return;
         }
         // during jump, nothing can be on top of us
-        if (obstacle(gameField[rabbitPosition.y - 1][rabbitPosition.x])) return;
+        if (obstacle(gameField[bunnyPosition.y - 1][bunnyPosition.x])) return;
         // we can only jump if there is obstacle in front
-        if (!obstacle(gameField[rabbitPosition.y][rabbitPosition.x + lastMove])) return;
+        if (!obstacle(gameField[bunnyPosition.y][bunnyPosition.x + lastMove])) return;
     }
 
-    let newX = rabbitPosition.x + dx;
-    let newY = rabbitPosition.y + dy;
+    let newX = bunnyPosition.x + dx;
+    let newY = bunnyPosition.y + dy;
 
     if (gameField[newY][newX] === BOX) {
         if (dy === -1) {
@@ -177,19 +177,19 @@ function tryMove(dx, dy) {
     // the new position is a wall
     if (obstacle(gameField[newY][newX])) return;
 
-    // move the rabbit
+    // move the bunny
     if (gameField[newY][newX] === CARROT) collectedCarrots++;
-    gameField[rabbitPosition.y][rabbitPosition.x] = EMPTY;
-    rabbitPosition.x = newX;
-    rabbitPosition.y = newY;
-    gameField[newY][newX] = RABBIT;
+    gameField[bunnyPosition.y][bunnyPosition.x] = EMPTY;
+    bunnyPosition.x = newX;
+    bunnyPosition.y = newY;
+    gameField[newY][newX] = BUNNY;
 }
 
 function placeCarrot() {
     if (collectedCarrots > 0) {
         // Determine the position to place the carrot
-        let placeX = rabbitPosition.x + lastMove;
-        let placeY = rabbitPosition.y;
+        let placeX = bunnyPosition.x + lastMove;
+        let placeY = bunnyPosition.y;
         if (gameField[placeY][placeX] === EMPTY) {
             gameField[placeY][placeX] = PLACED_CARROT;
             collectedCarrots--;
