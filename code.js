@@ -102,7 +102,7 @@ function drawGameField() {
                     // if moving right, it has to be mirrored (in the font it's facing left)
                     ctx.save(); // save the current state
                     ctx.scale(-1, 1); // flip the canvas
-                    ctx.fillText(emoji, (-1.2 - x) * cellSize, y * cellSize); // -x * cellSize - cellSize - cellSize / 4, y * cellSize);
+                    ctx.fillText(emoji, (-1.2 - x) * cellSize, y * cellSize);
                     ctx.restore(); // restore to the previous state
                 } else {
                     // if moving left, it has to be shifted a little bit
