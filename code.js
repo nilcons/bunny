@@ -66,14 +66,15 @@ function applyGravity() {
         for (let x = 0; x < gridWidth; x++) {
             if (gameField[y][x] === BOX || gameField[y][x] === RABBIT) {
                 // check if the space below is empty
-                if (gameField[y + 1][x] === EMPTY) {
+                if (gameField[y + 1][x] === EMPTY || gameField[y + 1][x] === CARROT) {
                     // move the box or the rabbit down
                     gravityWasApplied = true;
-                    gameField[y + 1][x] = gameField[y][x];
-                    gameField[y][x] = EMPTY;
-                    if (gameField[y + 1][x] === RABBIT) {
+                    if (gameField[y][x] === RABBIT) {
+                        if (gameField[y + 1][x] === CARROT) collectedCarrots++;
                         rabbitPosition.y++;
                     }
+                    gameField[y + 1][x] = gameField[y][x];
+                    gameField[y][x] = EMPTY;
                 }
             }
         }
@@ -110,18 +111,15 @@ function drawGameField() {
                 }
                 break;
             case BOX:
-                ctx.save();
-                ctx.filter = 'brightness(80%)';
-                ctx.fillText(emoji, x * cellSize, y * cellSize);
-                ctx.restore();
-                break;
             case WALL:
             case PLACED_CARROT:
                 ctx.save();
-                ctx.filter = 'brightness(60%)';
+                ctx.filter = emoji === BOX ? 'brightness(80%)' : 'brightness(60%)';
                 ctx.fillText(emoji, x * cellSize, y * cellSize);
                 ctx.restore();
                 break;
+            case CARROT:
+                ctx.fillText(emoji, x * cellSize, y * cellSize);
             }
         }
     }
@@ -137,6 +135,11 @@ function drawGameField() {
 function tryMove(dx, dy) {
     if (dy === -1) {
         // during jump, nothing can be on top of us
+        if (gameField[rabbitPosition.y - 1][rabbitPosition.x] === CARROT) {
+            collectedCarrots++;
+            gameField[rabbitPosition.y - 1][rabbitPosition.x] = EMPTY;
+            return;
+        }
         if (obstacle(gameField[rabbitPosition.y - 1][rabbitPosition.x])) return;
     }
 
@@ -172,6 +175,7 @@ function tryMove(dx, dy) {
     if (obstacle(gameField[newY][newX])) return;
 
     // move the rabbit
+    if (gameField[newY][newX] === CARROT) collectedCarrots++;
     gameField[rabbitPosition.y][rabbitPosition.x] = EMPTY;
     rabbitPosition.x = newX;
     rabbitPosition.y = newY;
@@ -184,7 +188,7 @@ function placeCarrot() {
         let placeX = rabbitPosition.x + lastMove;
         let placeY = rabbitPosition.y;
         if (gameField[placeY][placeX] === EMPTY) {
-            gameField[placeY][placeX] = CARROT;
+            gameField[placeY][placeX] = PLACED_CARROT;
             collectedCarrots--;
             drawGameField();
         }
@@ -208,6 +212,8 @@ window.addEventListener('keydown', function(e) {
         else
             lastMove = moveNow;
         break;
+    case ' ':
+        placeCarrot();
     }
 
     applyGravity();
