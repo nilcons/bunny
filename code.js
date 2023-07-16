@@ -181,6 +181,7 @@ window.addEventListener('keydown', function(e) {
 // setup canvas
 canvas.width = cellSize * gridWidth;
 canvas.height = cellSize * gridHeight;
+ctx.translate(-2, 4); // the wall in the font is not correctly centered
 ctx.textBaseline = 'top';
 ctx.font = `${cellSize - 3}px 'Noto Color Emoji', serif`;
 function resizeCanvas() {
