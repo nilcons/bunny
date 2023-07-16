@@ -32,7 +32,79 @@ let cellSize = 32;
 let gravityInMotion = false;
 
 // initialize game field
-function initializeGameField() {
+function stringToGameField(inputString) {
+    // Prepare the empty game field
+    let gameField = [];
+    for (let y = 0; y < gridHeight; y++) {
+        gameField[y] = [WALL];
+    }
+
+    // Split the input by new lines
+    let lines = inputString.trimRight().split('\n');
+
+    for (let x = 0; x < gridWidth; x++) {
+        gameField[0][x] = WALL;
+        gameField[gridHeight - 1][x] = WALL;
+    }
+
+    // Loop through each line
+    if (lines.length + 2 != gridHeight) throw("Bad number of lines: " + lines.length);
+    let bx = -1, by = -1;
+    for (let y = 1; y < lines.length + 1; y++) {
+        let line = lines[y - 1];
+
+        // Split the line into characters
+        let chars = line.split('');
+
+        // Convert each character to a game element and add it to the game field
+        if (chars.length + 2 != gridWidth) throw("Bad number of columns: " + chars.length);
+        for (let x = 1; x < chars.length + 1; x++) {
+            let char = chars[x - 1];
+            switch (char) {
+            case '#':
+                gameField[y][x] = WALL;
+                break;
+            case 'p':
+                gameField[y][x] = BOX;
+                break;
+            case 'b':
+                gameField[y][x] = BUNNY;
+                by = y;
+                bx = x;
+                break;
+            case ' ':
+            case 'g':
+                gameField[y][x] = EMPTY;
+                break;
+            case 'c':
+                gameField[y][x] = CARROT;
+                break;
+            default:
+                throw('Unrecognized character: ' + char);
+                break;
+            }
+        }
+        gameField[y][gridWidth - 1] = WALL;
+    }
+
+    if (by === -1 || bx === -1) throw('no bunny');
+    return { gameField: gameField, bunnyX: bx, bunnyY: by };
+}
+
+async function initializeGameField() {
+    try {
+        let r = (await fetch(window.location.search.substring(1)));
+        let field = (await r.text());
+        let ret = stringToGameField(field);
+        gameField = ret.gameField;
+        bunnyPosition.y = ret.bunnyY;
+        bunnyPosition.x = ret.bunnyX;
+        return;
+    } catch(e) {
+        console.log("Reading game field from URL parameter failed.");
+        console.log(e);
+    }
+
     for (let y = 0; y < gridHeight; y++) {
         gameField[y] = [];
         for (let x = 0; x < gridWidth; x++) {
