@@ -6,7 +6,7 @@ let gridHeight = 22;
 // emoji codes
 const WALL = '🟦';
 const RABBIT = '🐇';
-const BOX = '🟫';
+const BOX = '🟩';
 const CARROT = '🥕';
 const EMPTY = '⬜';
 
@@ -91,10 +91,6 @@ function drawGameField() {
         for (let x = 0; x < gridWidth; x++) {
             let emoji = gameField[y][x];
 
-            if (emoji === WALL) {
-                ctx.save();
-                ctx.filter = 'brightness(60%)';
-            }
 
             // rabbit has to be handled specially
             if (emoji === RABBIT) {
@@ -108,11 +104,15 @@ function drawGameField() {
                     // if moving left, it has to be shifted a little bit
                     ctx.fillText(emoji, (-0.1 + x) * cellSize, y * cellSize);
                 }
-            } else if (emoji !== EMPTY) {
+            } else if (emoji === BOX) {
+                ctx.save();
+                ctx.filter = 'brightness(80%)';
                 ctx.fillText(emoji, x * cellSize, y * cellSize);
-            }
-
-            if (emoji === WALL) {
+                ctx.restore();
+            } else if (emoji === WALL) {
+                ctx.save();
+                ctx.filter = 'brightness(60%)';
+                ctx.fillText(emoji, x * cellSize, y * cellSize);
                 ctx.restore();
             }
         }
