@@ -1,7 +1,7 @@
 /*    GAME   STATE   */
 // grid size
-let gridWidth = 30;
-let gridHeight = 22;
+let gridWidth = 32;
+let gridHeight = 24;
 
 // emoji codes
 const WALL = '🟦';
