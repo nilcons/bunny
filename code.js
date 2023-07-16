@@ -1,7 +1,6 @@
-/*    GAME   STATE   */
 // grid size
-let gridWidth = 32;
-let gridHeight = 24;
+const gridWidth = 32;
+const gridHeight = 24;
 
 // emoji codes
 const WALL = '🟦';
@@ -12,6 +11,7 @@ const PLACED_CARROT = '🟧';
 const EMPTY = '⬜';
 function obstacle(c) { return (c === WALL || c === PLACED_CARROT || c === BOX); }
 
+/*    GAME   STATE   */
 // the game field
 let gameField = [];
 
@@ -20,6 +20,7 @@ let bunnyPosition = {x: 0, y: 0};
 let lastMove = 1; // 1 is right, -1 is left
 let collectedCarrots = 0;
 /*    END OF GAME   STATE   */
+let history = [];
 
 // canvas and context
 let canvas = document.getElementById('gameCanvas');
@@ -278,6 +279,11 @@ function placeCarrot() {
 window.addEventListener('keydown', async function(e) {
     if (gravityInMotion) return;
 
+    if (e.key !== 'u') {
+        let newHistory = JSON.stringify([gameField, bunnyPosition, lastMove, collectedCarrots]);
+        if (history.length == 0 || history[history.length-1] !== newHistory) history.push(newHistory);
+    }
+
     switch (e.key) {
     case 'ArrowUp':
         tryMove(lastMove, -1);
@@ -292,6 +298,13 @@ window.addEventListener('keydown', async function(e) {
         break;
     case ' ':
         placeCarrot();
+        break;
+    case 'u':
+        if (history.length > 0) {
+            let oldHistory = history.pop();
+            [gameField, bunnyPosition, lastMove, collectedCarrots] = JSON.parse(oldHistory);
+        }
+        break;
     }
 
     await applyGravity();
