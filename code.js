@@ -9,13 +9,14 @@ const RABBIT = '🐇';
 const BOX = '🟩';
 const CARROT = '🥕';
 const EMPTY = '⬜';
+function obstacle(c) { return (c === WALL || c === BOX); }
 
 // the game field
 let gameField = [];
 
 // the rabbit position
 let rabbitPosition = {x: 0, y: 0};
-let lastMove = 'right';
+let lastMove = 1; // 1 is right, -1 is left
 /*    END OF GAME   STATE   */
 
 // canvas and context
@@ -93,7 +94,7 @@ function drawGameField() {
 
             switch (emoji) {
             case RABBIT:
-                if (lastMove === 'right') {
+                if (lastMove === 1) {
                     // if moving right, bunny has to be mirrored (in the font it's facing left)
                     ctx.save(); // save the current state
                     ctx.scale(-1, 1); // flip the canvas
@@ -125,14 +126,11 @@ function drawGameField() {
 function tryMove(dx, dy) {
     if (dy === -1) {
         // during jump, nothing can be on top of us
-        if ([ WALL, BOX ].includes(gameField[rabbitPosition.y - 1][rabbitPosition.x])) return;
+        if (obstacle(gameField[rabbitPosition.y - 1][rabbitPosition.x])) return;
     }
 
     let newX = rabbitPosition.x + dx;
     let newY = rabbitPosition.y + dy;
-
-    // the new position is a wall
-    if (gameField[newY][newX] === WALL) return;
 
     if (gameField[newY][newX] === BOX) {
         if (dy === -1) {
@@ -159,6 +157,9 @@ function tryMove(dx, dy) {
         }
     }
 
+    // the new position is a wall
+    if (obstacle(gameField[newY][newX])) return;
+
     // move the rabbit
     gameField[rabbitPosition.y][rabbitPosition.x] = EMPTY;
     rabbitPosition.x = newX;
@@ -172,22 +173,16 @@ window.addEventListener('keydown', function(e) {
 
     switch (e.key) {
     case 'ArrowUp':
-        if (lastMove === 'right' && [ WALL, BOX ].includes(gameField[rabbitPosition.y][rabbitPosition.x + 1]))
-            tryMove(1, -1);
-        if (lastMove === 'left' && [ WALL, BOX ].includes(gameField[rabbitPosition.y][rabbitPosition.x - 1]))
-            tryMove(-1, -1);
+        if (obstacle(gameField[rabbitPosition.y][rabbitPosition.x + lastMove]))
+            tryMove(lastMove, -1);
         break;
     case 'ArrowLeft':
-        if (lastMove === 'left')
-            tryMove(-1, 0);
-        else
-            lastMove = 'left';
-        break;
     case 'ArrowRight':
-        if (lastMove === 'right')
-            tryMove(1, 0);
+        let moveNow = e.key === 'ArrowLeft' ? -1 : 1;
+        if (lastMove === moveNow)
+            tryMove(moveNow, 0);
         else
-            lastMove = 'right';
+            lastMove = moveNow;
         break;
     }
 
