@@ -8,8 +8,9 @@ const WALL = '🟦';
 const RABBIT = '🐇';
 const BOX = '🟩';
 const CARROT = '🥕';
+const PLACED_CARROT = '🟧';
 const EMPTY = '⬜';
-function obstacle(c) { return (c === WALL || c === BOX); }
+function obstacle(c) { return (c === WALL || c === PLACED_CARROT || c === BOX); }
 
 // the game field
 let gameField = [];
@@ -17,6 +18,7 @@ let gameField = [];
 // the rabbit position
 let rabbitPosition = {x: 0, y: 0};
 let lastMove = 1; // 1 is right, -1 is left
+let collectedCarrots = 0;
 /*    END OF GAME   STATE   */
 
 // canvas and context
@@ -49,9 +51,11 @@ function initializeGameField() {
     gameField[rabbitPosition.y][rabbitPosition.x] = RABBIT;
 
     // place some boxes at random positions
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 35; i++) {
         let boxPosition = {x: Math.floor(Math.random() * (gridWidth - 2) + 1), y: Math.floor(Math.random() * (gridHeight - 2) + 1)};
         gameField[boxPosition.y][boxPosition.x] = BOX;
+        let carrotPosition = {x: Math.floor(Math.random() * (gridWidth - 2) + 1), y: Math.floor(Math.random() * (gridHeight - 2) + 1)};
+        gameField[carrotPosition.y][carrotPosition.x] = CARROT;
     }
 }
 
@@ -112,6 +116,7 @@ function drawGameField() {
                 ctx.restore();
                 break;
             case WALL:
+            case PLACED_CARROT:
                 ctx.save();
                 ctx.filter = 'brightness(60%)';
                 ctx.fillText(emoji, x * cellSize, y * cellSize);
@@ -120,6 +125,12 @@ function drawGameField() {
             }
         }
     }
+
+    ctx.save();
+    ctx.fillStyle = "#e70";
+    ctx.font = `20px sans-serif`;
+    ctx.fillText(`Collected carrots: ${collectedCarrots}`, 10, 3);
+    ctx.restore();
 }
 
 
@@ -165,6 +176,19 @@ function tryMove(dx, dy) {
     rabbitPosition.x = newX;
     rabbitPosition.y = newY;
     gameField[newY][newX] = RABBIT;
+}
+
+function placeCarrot() {
+    if (collectedCarrots > 0) {
+        // Determine the position to place the carrot
+        let placeX = rabbitPosition.x + lastMove;
+        let placeY = rabbitPosition.y;
+        if (gameField[placeY][placeX] === EMPTY) {
+            gameField[placeY][placeX] = CARROT;
+            collectedCarrots--;
+            drawGameField();
+        }
+    }
 }
 
 // handle keyboard input
