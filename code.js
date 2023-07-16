@@ -1,5 +1,7 @@
+/*    GAME   STATE   */
 // grid size
-let gridSize = 20;
+let gridWidth = 30;
+let gridHeight = 22;
 
 // emoji codes
 const WALL = '🟥';
@@ -14,6 +16,7 @@ let gameField = [];
 // the rabbit position
 let rabbitPosition = {x: 0, y: 0};
 let lastMove = 'right';
+/*    END OF GAME   STATE   */
 
 // canvas and context
 let canvas = document.getElementById('gameCanvas');
@@ -27,10 +30,10 @@ let gravityInMotion = false;
 
 // initialize game field
 function initializeGameField() {
-    for (let y = 0; y < gridSize; y++) {
+    for (let y = 0; y < gridHeight; y++) {
         gameField[y] = [];
-        for (let x = 0; x < gridSize; x++) {
-            if (y === 0 || x === 0 || y === gridSize - 1 || x === gridSize - 1) {
+        for (let x = 0; x < gridWidth; x++) {
+            if (y === 0 || x === 0 || y === gridHeight - 1 || x === gridWidth - 1) {
                 // put wall around the field
                 gameField[y][x] = WALL;
             } else {
@@ -41,20 +44,21 @@ function initializeGameField() {
     }
 
     // place a rabbit at a random position
-    rabbitPosition = {x: Math.floor(Math.random() * (gridSize - 2) + 1), y: Math.floor(Math.random() * (gridSize - 2) + 1)};
+    rabbitPosition = {x: Math.floor(Math.random() * (gridWidth - 2) + 1), y: Math.floor(Math.random() * (gridHeight - 2) + 1)};
     gameField[rabbitPosition.y][rabbitPosition.x] = RABBIT;
 
     // place some boxes at random positions
     for (let i = 0; i < 5; i++) {
-        let boxPosition = {x: Math.floor(Math.random() * (gridSize - 2) + 1), y: Math.floor(Math.random() * (gridSize - 2) + 1)};
+        let boxPosition = {x: Math.floor(Math.random() * (gridWidth - 2) + 1), y: Math.floor(Math.random() * (gridHeight - 2) + 1)};
         gameField[boxPosition.y][boxPosition.x] = BOX;
     }
 }
 
 function applyGravity() {
     let gravityWasApplied = false;
-    for (let y = gridSize - 2; y >= 0; y--) {
-        for (let x = 0; x < gridSize; x++) {
+
+    for (let y = gridHeight - 2; y >= 0; y--) {
+        for (let x = 0; x < gridWidth; x++) {
             if (gameField[y][x] === BOX || gameField[y][x] === RABBIT) {
                 // check if the space below is empty
                 if (gameField[y + 1][x] === EMPTY) {
@@ -83,8 +87,8 @@ function applyGravity() {
 // draw the game field
 function drawGameField() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    for (let y = 0; y < gridSize; y++) {
-        for (let x = 0; x < gridSize; x++) {
+    for (let y = 0; y < gridHeight; y++) {
+        for (let x = 0; x < gridWidth; x++) {
             let emoji = gameField[y][x];
 
             if (emoji === WALL) {
@@ -179,8 +183,8 @@ window.addEventListener('keydown', function(e) {
 // }
 
 // setup canvas
-canvas.width = cellSize * gridSize;
-canvas.height = cellSize * gridSize;
+canvas.width = cellSize * gridWidth;
+canvas.height = cellSize * gridHeight;
 ctx.textBaseline = 'top';
 ctx.font = `${cellSize}px 'color-emoji', serif`;
 
