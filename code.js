@@ -23,7 +23,7 @@ let canvas = document.getElementById('gameCanvas');
 let ctx = canvas.getContext('2d');
 
 // size of each cell in pixels
-let cellSize = 30;
+let cellSize = 32;
 
 // moving disabled, because we are doing gravity check
 let gravityInMotion = false;
@@ -178,7 +178,17 @@ window.addEventListener('keydown', function(e) {
 canvas.width = cellSize * gridWidth;
 canvas.height = cellSize * gridHeight;
 ctx.textBaseline = 'top';
-ctx.font = `${cellSize}px 'Noto Color Emoji', serif`;
+ctx.font = `${cellSize - 3}px 'Noto Color Emoji', serif`;
+function resizeCanvas() {
+    let scale = Math.min(
+        window.innerHeight / (cellSize * gridHeight),
+        window.innerWidth / (cellSize * gridWidth)
+    );
+
+    canvas.style.transform = `scale(${scale})`;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
 
 // start the game
 initializeGameField();
