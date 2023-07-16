@@ -174,14 +174,6 @@ window.addEventListener('keydown', function(e) {
     applyGravity();
 });
 
-// // main game loop
-// function gameLoop() {
-//     ctx.clearRect(0, 0, canvas.width, canvas.height);
-//     applyGravity();
-//     drawGameField();
-//     requestAnimationFrame(gameLoop);
-// }
-
 // setup canvas
 canvas.width = cellSize * gridWidth;
 canvas.height = cellSize * gridHeight;
