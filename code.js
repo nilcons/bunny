@@ -96,7 +96,7 @@ async function applyGravity() {
 
 // draw the game field
 function drawGameField() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(-100, -100, canvas.width + 100, canvas.height + 100);
     for (let y = 0; y < gridHeight; y++) {
         for (let x = 0; x < gridWidth; x++) {
             let emoji = gameField[y][x];
