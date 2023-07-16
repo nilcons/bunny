@@ -96,16 +96,20 @@ function drawGameField() {
                 ctx.filter = 'brightness(60%)';
             }
 
-            // if the character is the rabbit and the last move was to the right
-            if (emoji === RABBIT && lastMove === 'right') {
-                ctx.save(); // save the current state
-                ctx.scale(-1, 1); // flip the canvas
-                // draw the rabbit mirrored
-                ctx.fillText(emoji, -x * cellSize - cellSize - 8, y * cellSize);
-                ctx.restore(); // restore to the previous state
-            } else {
-                if (emoji !== EMPTY)
-                    ctx.fillText(emoji, x * cellSize, y * cellSize);
+            // rabbit has to be handled specially
+            if (emoji === RABBIT) {
+                if (lastMove === 'right') {
+                    // if moving right, it has to be mirrored (in the font it's facing left)
+                    ctx.save(); // save the current state
+                    ctx.scale(-1, 1); // flip the canvas
+                    ctx.fillText(emoji, (-1.2 - x) * cellSize, y * cellSize); // -x * cellSize - cellSize - cellSize / 4, y * cellSize);
+                    ctx.restore(); // restore to the previous state
+                } else {
+                    // if moving left, it has to be shifted a little bit
+                    ctx.fillText(emoji, (-0.1 + x) * cellSize, y * cellSize);
+                }
+            } else if (emoji !== EMPTY) {
+                ctx.fillText(emoji, x * cellSize, y * cellSize);
             }
 
             if (emoji === WALL) {
