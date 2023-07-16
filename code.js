@@ -91,11 +91,10 @@ function drawGameField() {
         for (let x = 0; x < gridWidth; x++) {
             let emoji = gameField[y][x];
 
-
-            // rabbit has to be handled specially
-            if (emoji === RABBIT) {
+            switch (emoji) {
+            case RABBIT:
                 if (lastMove === 'right') {
-                    // if moving right, it has to be mirrored (in the font it's facing left)
+                    // if moving right, bunny has to be mirrored (in the font it's facing left)
                     ctx.save(); // save the current state
                     ctx.scale(-1, 1); // flip the canvas
                     ctx.fillText(emoji, (-1.2 - x) * cellSize, y * cellSize);
@@ -104,16 +103,19 @@ function drawGameField() {
                     // if moving left, it has to be shifted a little bit
                     ctx.fillText(emoji, (-0.1 + x) * cellSize, y * cellSize);
                 }
-            } else if (emoji === BOX) {
+                break;
+            case BOX:
                 ctx.save();
                 ctx.filter = 'brightness(80%)';
                 ctx.fillText(emoji, x * cellSize, y * cellSize);
                 ctx.restore();
-            } else if (emoji === WALL) {
+                break;
+            case WALL:
                 ctx.save();
                 ctx.filter = 'brightness(60%)';
                 ctx.fillText(emoji, x * cellSize, y * cellSize);
                 ctx.restore();
+                break;
             }
         }
     }
@@ -121,6 +123,11 @@ function drawGameField() {
 
 
 function tryMove(dx, dy) {
+    if (dy === -1) {
+        // during jump, nothing can be on top of us
+        if ([ WALL, BOX ].includes(gameField[rabbitPosition.y - 1][rabbitPosition.x])) return;
+    }
+
     let newX = rabbitPosition.x + dx;
     let newY = rabbitPosition.y + dy;
 
@@ -155,7 +162,6 @@ window.addEventListener('keydown', function(e) {
 
     switch (e.key) {
     case 'ArrowUp':
-        if ([ WALL, BOX ].includes(gameField[rabbitPosition.y - 1][rabbitPosition.x])) return;
         if (lastMove === 'right' && [ WALL, BOX ].includes(gameField[rabbitPosition.y][rabbitPosition.x + 1]))
             tryMove(1, -1);
         if (lastMove === 'left' && [ WALL, BOX ].includes(gameField[rabbitPosition.y][rabbitPosition.x - 1]))
